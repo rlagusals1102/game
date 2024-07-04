@@ -6,7 +6,7 @@ export class FruitManager {
     this._engine = engine;
     this._world = engine.world;
     this._tempFruit = null;
-    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1)); // Initialize without watermelon
+    this._currentFruitIndex = 0; 
     this._setupCollisionEvents();
   }
 
@@ -71,7 +71,7 @@ export class FruitManager {
       collisionFilter: { group: -1 },
       isSleeping: true,
       render: {
-        sprite: { texture: `${fruit.name}.png`, opacity: 0.5 },
+        sprite: { texture: `${fruit.name}.png`, opacity: 0.5 }, 
       },
       restitution: 0.2,
       label: 'tempFruit',
@@ -83,7 +83,7 @@ export class FruitManager {
 
   addFruit(x) {
     const clampedX = this.checkX(x);
-    const fruit = FRUITS[this._currentFruitIndex]; 
+    const fruit = FRUITS[this._currentFruitIndex];
 
     const newFruit = Bodies.circle(clampedX, 80, fruit.radius, {
       render: {
@@ -94,7 +94,7 @@ export class FruitManager {
     });
 
     World.add(this._world, newFruit);
-    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1));
+    this._currentFruitIndex = Math.floor(Math.random() * 6); 
     this.updateTempFruit(clampedX); 
     return newFruit;
   }
