@@ -1,31 +1,51 @@
-import { FRUITS } from './fruits.js'
-const { Bodies, World, Composite, Events } = Matter
+import { FRUITS } from './fruits.js';
+const { Bodies, World, Composite, Events } = Matter;
 
 export class FruitManager {
   constructor(engine) {
-    this._engine = engine
-    this._world = engine.world
-    this._tempFruit = null
-    this._index = 0
-    this._setupCollisionEvents()
+    this._engine = engine;
+    this._world = engine.world;
+    this._tempFruit = null;
+    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1)); // Initialize without watermelon
+    this._setupCollisionEvents();
   }
 
   _setupCollisionEvents() {
     Events.on(this._engine, 'collisionStart', (event) => {
       event.pairs.forEach((collisionEvent) => {
-        const { bodyA, bodyB } = collisionEvent
-        if (bodyA.render.sprite.texture !== bodyB.render.sprite.texture) return
+        const { bodyA, bodyB } = collisionEvent;
+        if (bodyA.render.sprite.texture !== bodyB.render.sprite.texture) return;
 
-        const bodyASpriteNum = this.extractNumbers(bodyA.render.sprite.texture)
-        const bodyBSpriteNum = this.extractNumbers(bodyB.render.sprite.texture)
+        const bodyASpriteNum = this.extractNumbers(bodyA.render.sprite.texture);
+        const bodyBSpriteNum = this.extractNumbers(bodyB.render.sprite.texture);
 
-        if (Number(bodyASpriteNum) + 1 > 10) return
+        // Combine melons to create a watermelon
+        if (Number(bodyASpriteNum) === 9 && Number(bodyBSpriteNum) === 9) {
+          Composite.remove(this._world, bodyA);
+          Composite.remove(this._world, bodyB);
+
+          const WATERMELON = {
+            name: '/image/10_watermelon',
+            radius: 259 / 2,
+          };
+
+          const watermelon = Bodies.circle(bodyA.position.x, bodyA.position.y, WATERMELON.radius, {
+            render: {
+              sprite: { texture: `${WATERMELON.name}.png` },
+            },
+            restitution: 0.1,
+            label: 'fruit',
+          });
+
+          World.add(this._world, watermelon);
+          return;
+        }
 
         if (bodyASpriteNum === bodyBSpriteNum) {
-          Composite.remove(this._world, bodyA)
-          Composite.remove(this._world, bodyB)
+          Composite.remove(this._world, bodyA);
+          Composite.remove(this._world, bodyB);
 
-          const BIGGERFRUITS = FRUITS[Number(bodyASpriteNum) + 1]
+          const BIGGERFRUITS = FRUITS[Number(bodyASpriteNum) + 1];
 
           const biggerFruit = Bodies.circle(bodyA.position.x, bodyA.position.y, BIGGERFRUITS.radius, {
             render: {
@@ -33,38 +53,38 @@ export class FruitManager {
             },
             restitution: 0.1,
             label: 'fruit',
-          })
+          });
 
-          World.add(this._world, biggerFruit)
+          World.add(this._world, biggerFruit);
         }
-      })
-    })
+      });
+    });
   }
 
   updateTempFruit(x) {
     if (this._tempFruit) {
-      Composite.remove(this._world, this._tempFruit)
+      Composite.remove(this._world, this._tempFruit);
     }
-    const clampedX = this.checkX(x)
-    const fruit = FRUITS[this._index]
+    const clampedX = this.checkX(x);
+    const fruit = FRUITS[this._currentFruitIndex]; // Use current fruit index
 
     this._tempFruit = Bodies.circle(clampedX, 80, fruit.radius, {
       collisionFilter: { group: -1 },
       isSleeping: true,
       render: {
-        sprite: { texture: `${fruit.name}.png` },
+        sprite: { texture: `${fruit.name}.png`, opacity: 0.5 }, // Set opacity for the preview
       },
       restitution: 0.2,
       label: 'tempFruit',
       isSensor: true,
-    })
+    });
 
-    World.add(this._world, this._tempFruit)
+    World.add(this._world, this._tempFruit);
   }
 
   addFruit(x) {
-    const clampedX = this.checkX(x)
-    const fruit = FRUITS[this._index]
+    const clampedX = this.checkX(x);
+    const fruit = FRUITS[this._currentFruitIndex]; // Use current fruit index
 
     const newFruit = Bodies.circle(clampedX, 80, fruit.radius, {
       render: {
@@ -72,20 +92,22 @@ export class FruitManager {
       },
       restitution: 0,
       label: 'fruit',
-    })
+    });
 
-    World.add(this._world, newFruit)
-    this._index = Math.floor(Math.random() * FRUITS.length)
-    return newFruit
+    World.add(this._world, newFruit);
+    // Randomly change the preview fruit for the next time
+    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1)); // Exclude watermelon
+    this.updateTempFruit(clampedX); // Update the preview with the new fruit
+    return newFruit;
   }
 
   checkX(x) {
-    if (x < 47) return 47
-    if (x > 575) return 575
-    return x
+    if (x < 47) return 47;
+    if (x > 575) return 575;
+    return x;
   }
 
   extractNumbers(str) {
-    return str.match(/\d+/g).join('')
+    return str.match(/\d+/g).join('');
   }
 }
