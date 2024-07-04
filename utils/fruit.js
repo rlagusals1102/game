@@ -19,7 +19,6 @@ export class FruitManager {
         const bodyASpriteNum = this.extractNumbers(bodyA.render.sprite.texture);
         const bodyBSpriteNum = this.extractNumbers(bodyB.render.sprite.texture);
 
-        // Combine melons to create a watermelon
         if (Number(bodyASpriteNum) === 9 && Number(bodyBSpriteNum) === 9) {
           Composite.remove(this._world, bodyA);
           Composite.remove(this._world, bodyB);
@@ -66,13 +65,13 @@ export class FruitManager {
       Composite.remove(this._world, this._tempFruit);
     }
     const clampedX = this.checkX(x);
-    const fruit = FRUITS[this._currentFruitIndex]; // Use current fruit index
+    const fruit = FRUITS[this._currentFruitIndex]; 
 
     this._tempFruit = Bodies.circle(clampedX, 80, fruit.radius, {
       collisionFilter: { group: -1 },
       isSleeping: true,
       render: {
-        sprite: { texture: `${fruit.name}.png`, opacity: 0.5 }, // Set opacity for the preview
+        sprite: { texture: `${fruit.name}.png`, opacity: 0.5 },
       },
       restitution: 0.2,
       label: 'tempFruit',
@@ -84,7 +83,7 @@ export class FruitManager {
 
   addFruit(x) {
     const clampedX = this.checkX(x);
-    const fruit = FRUITS[this._currentFruitIndex]; // Use current fruit index
+    const fruit = FRUITS[this._currentFruitIndex]; 
 
     const newFruit = Bodies.circle(clampedX, 80, fruit.radius, {
       render: {
@@ -95,9 +94,8 @@ export class FruitManager {
     });
 
     World.add(this._world, newFruit);
-    // Randomly change the preview fruit for the next time
-    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1)); // Exclude watermelon
-    this.updateTempFruit(clampedX); // Update the preview with the new fruit
+    this._currentFruitIndex = Math.floor(Math.random() * (FRUITS.length - 1));
+    this.updateTempFruit(clampedX); 
     return newFruit;
   }
 

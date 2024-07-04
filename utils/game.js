@@ -14,7 +14,7 @@ export class Game {
     this.lastAddedFruit = null;
     this.SPAWN_DELAY = 10;
     this.GAME_OVER_DELAY = 2000;
-    this.tempFruitX = 310; // Initial position of the temporary fruit
+    this.tempFruitX = 310; 
   }
 
   start() {
@@ -59,18 +59,18 @@ export class Game {
   onKeyDown(e) {
     if (this.isGameOver) return;
     switch (e.key) {
-      case 'a': // English 'a'
-      case 'ㅁ': // Korean 'ㅁ'
-        this.tempFruitX = Math.max(this.tempFruitX - 10, 47); // Move left, ensure it stays within bounds
+      case 'a': 
+      case 'ㅁ':
+        this.tempFruitX = Math.max(this.tempFruitX - 10, 47); 
         this.fruitManager.updateTempFruit(this.tempFruitX);
         break;
-      case 'd': // English 'd'
-      case 'ㅇ': // Korean 'ㅇ'
-        this.tempFruitX = Math.min(this.tempFruitX + 10, 575); // Move right, ensure it stays within bounds
+      case 'd': 
+      case 'ㅇ':
+        this.tempFruitX = Math.min(this.tempFruitX + 10, 575);
         this.fruitManager.updateTempFruit(this.tempFruitX);
         break;
-      case 's': // English 's'
-      case 'ㄴ': // Korean 'ㄴ'
+      case 's': 
+      case 'ㄴ': 
         this.addFruit();
         break;
     }
